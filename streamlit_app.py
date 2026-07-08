@@ -135,6 +135,14 @@ python -m src.main build
         "How should covariance be implemented?"
     ]
     
+    # Initialize session state for query input
+    if "query_input" not in st.session_state:
+        st.session_state.query_input = ""
+    
+    # Callback function for example buttons
+    def set_query(example_query):
+        st.session_state.query_input = example_query
+    
     # Query input
     query = st.text_input(
         "Enter your question about Python typing:",
@@ -147,9 +155,7 @@ python -m src.main build
     cols = st.columns(4)
     for i, example in enumerate(example_queries):
         col = cols[i % 4]
-        if col.button(example, key=f"example_{i}", use_container_width=True):
-            st.session_state.query_input = example
-            st.rerun()
+        col.button(example, key=f"example_{i}", use_container_width=True, on_click=set_query, args=(example,))
     
     # Analyze button
     if st.button("🔍 Analyze", type="primary", use_container_width=True):
