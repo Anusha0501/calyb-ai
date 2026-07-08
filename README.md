@@ -236,6 +236,52 @@ Import `graph.graphml` into:
 
 The graph includes typed nodes and edges with confidence scores, enabling rich visual analysis of PEP relationships.
 
+## Streamlit Demo
+
+A web-based interface for exploring the knowledge graph and reasoning system.
+
+### Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+### Running the Demo
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The application will open in your browser at `http://localhost:8501`
+
+### Features
+
+**Tab 1: Ask Questions**
+- Interactive query input for asking questions about Python typing
+- Example query buttons for quick exploration
+- Detailed results with relevant PEPs, decisions, tradeoffs, and evidence
+- Confidence scoring with visual progress indicators
+
+**Tab 2: Explore Knowledge Graph**
+- Graph statistics and metrics
+- Node type distribution visualization
+- Searchable node table with filtering
+- GraphML file download
+
+**Tab 3: Browse PEPs**
+- Dropdown selection of all PEPs
+- Detailed PEP information display
+- Section previews and metadata
+- Referenced PEP links
+
+**Tab 4: Project Information**
+- Architecture diagram
+- Entity and relationship type documentation
+- Reasoning algorithm explanation
+- Engineering tradeoffs discussion
+
+![Streamlit Demo Screenshot](https://via.placeholder.com/800x600?text=Streamlit+Demo+Screenshot)
+
 ## Contributing
 
 Contributions are welcome! Areas for improvement:
