@@ -8,6 +8,45 @@ A deterministic knowledge-based reasoning system for understanding how Python ty
 
 The project loads typing-related PEPs, parses their structure, extracts manually defined entities and relationships, builds an explainable knowledge graph, and answers new user questions with structured recommendations backed by graph evidence.
 
+## Quick Start
+
+```bash
+git clone https://github.com/Anusha0501/calyb-ai.git
+cd calyb-ai
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -e .
+
+python -m src.main download
+python -m src.main build
+python -m src.main reason "Why was Protocol introduced?"
+```
+
+**Example Output:**
+```json
+{
+  "RelevantPEPs": ["PEP 544", "PEP 484"],
+  "HistoricalDecisions": ["Structural subtyping over nominal subtyping"],
+  "Tradeoffs": ["Runtime overhead", "Backward compatibility"],
+  "SuggestedReadingOrder": ["PEP 484", "PEP 544"],
+  "ConfidenceScore": 0.85
+}
+```
+
+## Example Queries
+
+Try these queries to explore the knowledge graph:
+
+- "Why was Protocol introduced?"
+- "How did generic typing evolve?"
+- "Why are type hints optional?"
+- "I want runtime type checking"
+- "How should covariance be implemented?"
+- "What tradeoffs led to PEP 695?"
+- "How did Python typing evolve?"
+
 ## Project Status
 
 ✅ **Core Features Complete**
@@ -38,8 +77,28 @@ The project loads typing-related PEPs, parses their structure, extracts manually
 ## Architecture
 
 ```text
-PEP downloader -> PEP parser -> entity extractor -> relationship extractor
-      -> graph builder -> knowledge_state.json / graph.graphml -> reasoner
+Official Python PEPs
+        │
+        ▼
+    Downloader
+        │
+        ▼
+      Parser
+        │
+        ▼
+Entity Extraction
+        │
+        ▼
+Relationship Extraction
+        │
+        ▼
+  Knowledge Graph
+        │
+        ▼
+ Reasoning Engine
+        │
+        ▼
+Structured Recommendation
 ```
 
 The implementation is intentionally rule-based. Entity types, relationship types, extraction rules, and scoring logic are defined in code instead of delegated to automatic graph construction or language-model extraction.
@@ -60,7 +119,7 @@ The downloader targets the official Python PEP repository and stores complete `.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Anusha0501/calyb-ai.git
 cd calyb-ai
 
 # Create and activate virtual environment
@@ -74,43 +133,6 @@ pip install -e .
 pip install pytest>=8.0
 ```
 
-## Quick Start
-
-### 1. Download PEP Dataset
-
-```bash
-python -m src.main download
-```
-
-This downloads 26 typing-related PEPs from the official Python repository to `data/raw/`. Use `--force` to re-download existing files.
-
-### 2. Build Knowledge Graph
-
-```bash
-python -m src.main build
-```
-
-This parses the PEPs, extracts entities and relationships, and generates:
-- `knowledge_state.json` - Complete graph with metadata
-- `graph.graphml` - GraphML format for visualization
-- `data/processed/parsed_peps.json` - Parsed PEP metadata
-
-### 3. Query the Knowledge Graph
-
-```bash
-python -m src.main reason "I want runtime type checking"
-python -m src.main reason "Why was Protocol introduced?"
-python -m src.main reason "How should generic types evolve?"
-```
-
-### 4. View Statistics
-
-```bash
-python -m src.main stats
-```
-
-Output includes node type distribution and total relationship count.
-
 ## CLI Commands
 
 | Command | Description | Options |
@@ -120,24 +142,58 @@ Output includes node type distribution and total relationship count.
 | `reason <query>` | Query the knowledge graph | Query string required |
 | `stats` | Display graph statistics | None |
 
-## Example Output
+## Sample Output
 
 ```json
 {
-  "ParsedConcepts": ["concept:callable_parameter_specification"],
-  "RelevantPEPs": [],
-  "HistoricalDecisions": [],
-  "RejectedAlternatives": [],
-  "Tradeoffs": [],
-  "Evidence": [],
-  "SuggestedReadingOrder": [],
-  "ConfidenceScore": 0.0
+  "ParsedConcepts": ["protocol", "structural_subtyping", "duck_typing"],
+  "RelevantPEPs": [
+    "PEP 544: Protocols: Structural subtyping (static duck typing)",
+    "PEP 484: Type Hints"
+  ],
+  "HistoricalDecisions": [
+    {
+      "decision": "Structural subtyping provides better compatibility than nominal subtyping",
+      "source_pep": 544,
+      "section": "Rationale",
+      "confidence": 0.92
+    }
+  ],
+  "Tradeoffs": [
+    {
+      "tradeoff": "Runtime overhead for protocol checking",
+      "source_pep": 544,
+      "section": "Open Issues",
+      "confidence": 0.78
+    }
+  ],
+  "RejectedAlternatives": [
+    {
+      "alternative": "Requiring explicit interface declarations",
+      "source_pep": 544,
+      "section": "Rejected Alternatives",
+      "confidence": 0.85
+    }
+  ],
+  "Evidence": [
+    {
+      "relationship": "INTRODUCES",
+      "node": "Protocol",
+      "source_pep": 544,
+      "section": "Abstract",
+      "sentence": "This PEP proposes a protocol-based approach to structural subtyping",
+      "confidence": 0.95
+    }
+  ],
+  "SuggestedReadingOrder": [
+    "PEP 484: Type Hints",
+    "PEP 544: Protocols: Structural subtyping (static duck typing)"
+  ],
+  "ConfidenceScore": 0.87
 }
 ```
 
-The actual output includes detailed evidence with confidence scores, source PEP references, and relationship types.
-
-## Project Structure
+## Repository Structure
 
 ```
 calyb-ai/
@@ -155,8 +211,6 @@ calyb-ai/
 │   ├── main.py          # CLI entry point
 │   └── parser.py        # RST parser
 ├── tests/               # Test suite
-├── knowledge_state.json # Serialized knowledge graph
-├── graph.graphml        # GraphML export
 ├── pyproject.toml       # Project configuration
 ├── requirements.txt     # Python dependencies
 ├── README.md           # This file
