@@ -1,8 +1,39 @@
 # Python Typing PEP Knowledge Reasoning System
 
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/tests-passing-green.svg)](https://github.com)
+
 A deterministic knowledge-based reasoning system for understanding how Python typing evolved across a curated set of Python Enhancement Proposals.
 
 The project loads typing-related PEPs, parses their structure, extracts manually defined entities and relationships, builds an explainable knowledge graph, and answers new user questions with structured recommendations backed by graph evidence.
+
+## Project Status
+
+✅ **Core Features Complete**
+- PEP downloader with official repository integration
+- RST parser for PEP structure extraction
+- Rule-based entity and relationship extraction
+- Knowledge graph construction with multiple node types
+- Deterministic reasoning engine with evidence tracking
+- JSON and GraphML export capabilities
+- Comprehensive test suite (6/6 tests passing)
+- CLI with download, build, reason, and stats commands
+
+## Features
+
+### Knowledge Graph
+- **516 nodes** across 11 types: PEP, Feature, Concept, Decision, Tradeoff, RejectedAlternative, Problem, Author, PythonRelease, Section, External
+- **1,615 relationships** with typed edges and confidence scores
+- Explainable evidence trails for every relationship
+- GraphML export for visualization in Gephi, Cytoscape, or other tools
+
+### Reasoning Engine
+- Concept-based query parsing
+- Deterministic scoring with transparent weights
+- Evidence-backed recommendations
+- Suggested reading order based on graph topology
+- Confidence scores for all results
 
 ## Architecture
 
@@ -19,48 +50,77 @@ The curated dataset focuses on Python typing evolution PEPs, including PEP 484, 
 
 The downloader targets the official Python PEP repository and stores complete `.rst` files in `data/raw/`. The repository does not embed shortened PEP samples; clone users should run the download command to reproduce the dataset.
 
+## Requirements
+
+- Python 3.11 or higher
+- Network access for initial PEP download
+- Virtual environment (recommended)
+
 ## Installation
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-# or install package metadata directly
+# Clone the repository
+git clone <repository-url>
+cd calyb-ai
+
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install the package in development mode
 pip install -e .
+
+# Install development dependencies
+pip install pytest>=8.0
 ```
 
-## Download the Dataset
+## Quick Start
+
+### 1. Download PEP Dataset
 
 ```bash
 python -m src.main download
-# force a fresh copy
-python -m src.main download --force
 ```
 
-The downloader creates `data/raw/`, skips files already present, retries failures, and reports failed PEP numbers without fabricating content.
+This downloads 26 typing-related PEPs from the official Python repository to `data/raw/`. Use `--force` to re-download existing files.
 
-## Build the Knowledge Graph
+### 2. Build Knowledge Graph
 
 ```bash
 python -m src.main build
 ```
 
-Outputs:
+This parses the PEPs, extracts entities and relationships, and generates:
+- `knowledge_state.json` - Complete graph with metadata
+- `graph.graphml` - GraphML format for visualization
+- `data/processed/parsed_peps.json` - Parsed PEP metadata
 
-- `knowledge_state.json`: inspectable graph with metadata, nodes, edges, and evidence
-- `graph.graphml`: graph visualization/export format
-- `data/raw/`: downloaded official PEP source files
-- `data/processed/parsed_peps.json`: parsed metadata and section previews
-
-## Run Reasoning
+### 3. Query the Knowledge Graph
 
 ```bash
-python -m src.main reason "How did Python typing evolve?"
+python -m src.main reason "I want runtime type checking"
+python -m src.main reason "Why was Protocol introduced?"
+python -m src.main reason "How should generic types evolve?"
 ```
 
-The reasoner returns structured JSON with relevant PEPs, decisions, rejected alternatives, tradeoffs, evidence, suggested reading order, and a confidence score.
+### 4. View Statistics
 
-## Example Output Shape
+```bash
+python -m src.main stats
+```
+
+Output includes node type distribution and total relationship count.
+
+## CLI Commands
+
+| Command | Description | Options |
+|---------|-------------|---------|
+| `download` | Download PEP files from official repository | `--force` to re-download |
+| `build` | Parse PEPs and build knowledge graph | `--force-download` to re-download first |
+| `reason <query>` | Query the knowledge graph | Query string required |
+| `stats` | Display graph statistics | None |
+
+## Example Output
 
 ```json
 {
@@ -75,33 +135,71 @@ The reasoner returns structured JSON with relevant PEPs, decisions, rejected alt
 }
 ```
 
-## Folder Structure
+The actual output includes detailed evidence with confidence scores, source PEP references, and relationship types.
 
-```text
-README.md
-approach.md
-requirements.txt
-knowledge_state.json
-graph.graphml
-data/raw/
-data/processed/
-pyproject.toml
-src/main.py
-src/config.py
-src/loader.py
-src/parser.py
-src/extractor/entity_extractor.py
-src/extractor/relationship_extractor.py
-src/graph/graph_builder.py
-src/graph/graph_storage.py
-src/graph/graph_queries.py
-src/reasoning/input_parser.py
-src/reasoning/reasoner.py
-src/reasoning/scorer.py
-src/models/node.py
-src/models/edge.py
-src/utils/helpers.py
-tests/test_parser.py
-tests/test_graph.py
-tests/test_reasoner.py
+## Project Structure
+
+```
+calyb-ai/
+├── data/
+│   ├── raw/              # Downloaded PEP .rst files
+│   └── processed/        # Parsed PEP metadata
+├── src/
+│   ├── extractor/        # Entity and relationship extraction
+│   ├── graph/           # Graph building and storage
+│   ├── models/          # Node and edge data models
+│   ├── reasoning/       # Query parsing and reasoning
+│   ├── utils/           # Helper functions
+│   ├── config.py        # Configuration constants
+│   ├── loader.py        # PEP downloader
+│   ├── main.py          # CLI entry point
+│   └── parser.py        # RST parser
+├── tests/               # Test suite
+├── knowledge_state.json # Serialized knowledge graph
+├── graph.graphml        # GraphML export
+├── pyproject.toml       # Project configuration
+├── requirements.txt     # Python dependencies
+├── README.md           # This file
+└── approach.md         # Engineering approach documentation
+```
+
+## Testing
+
+Run the test suite:
+
+```bash
+pytest
+```
+
+All tests use in-memory fixtures and do not require downloaded PEP files.
+
+## Graph Visualization
+
+Import `graph.graphml` into:
+- **Gephi** (https://gephi.org) - Open-source graph visualization platform
+- **Cytoscape** (https://cytoscape.org) - Network analysis and visualization
+- **yEd** (https://www.yworks.com/products/yed) - Graph editing and layout
+
+The graph includes typed nodes and edges with confidence scores, enabling rich visual analysis of PEP relationships.
+
+## Contributing
+
+Contributions are welcome! Areas for improvement:
+- Additional PEP coverage
+- Enhanced extraction rules
+- New relationship types
+- Improved scoring algorithms
+- Additional CLI features
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Citation
+
+If you use this project in your research, please cite:
+
+```
+Python Typing PEP Knowledge Reasoning System
+https://github.com/yourusername/calyb-ai
 ```

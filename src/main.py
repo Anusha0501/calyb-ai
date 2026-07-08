@@ -57,6 +57,24 @@ def reason(query: str, knowledge_path: Path = KNOWLEDGE_STATE_PATH) -> None:
     graph = load_graph(knowledge_path)
     print(json.dumps(Reasoner(graph).reason(query), indent=2))
 
+def stats(knowledge_path: Path = KNOWLEDGE_STATE_PATH) -> None:
+    graph = load_graph(knowledge_path)
+    node_types = {}
+    for node in graph.nodes.values():
+        node_type = node.type
+        node_types[node_type] = node_types.get(node_type, 0) + 1
+    
+    total_nodes = len(graph.nodes)
+    total_relationships = len(graph.edges)
+    
+    print("Knowledge Graph Statistics")
+    print()
+    for node_type, count in sorted(node_types.items()):
+        print(f"{node_type}: {count}")
+    print()
+    print(f"Total Nodes: {total_nodes}")
+    print(f"Total Relationships: {total_relationships}")
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Build and query a typing PEP knowledge graph.")
     sub = ap.add_subparsers(dest="command", required=True)
@@ -66,6 +84,7 @@ def main() -> None:
     b.add_argument("--force-download", action="store_true", help="Re-download the dataset before building.")
     q = sub.add_parser("reason", help="Run deterministic reasoning for a new input.")
     q.add_argument("query")
+    s = sub.add_parser("stats", help="Print knowledge graph statistics.")
     args = ap.parse_args()
     if args.command == "download":
         download_dataset(args.force)
@@ -73,6 +92,8 @@ def main() -> None:
         build_graph(args.force_download)
     elif args.command == "reason":
         reason(args.query)
+    elif args.command == "stats":
+        stats()
 
 if __name__ == "__main__":
     main()

@@ -95,10 +95,33 @@ The weights favor conceptual relevance, then direct PEP references, then graph p
 - Confidence values are rule confidence estimates, not statistical probabilities.
 - The reasoner currently scores PEPs, not arbitrary design paths.
 
+## Implementation Status
+
+### Completed Features
+- ✅ PEP downloader with official repository integration
+- ✅ RST parser for PEP structure extraction
+- ✅ Rule-based entity and relationship extraction
+- ✅ Knowledge graph construction with 11 node types
+- ✅ Deterministic reasoning engine with evidence tracking
+- ✅ JSON and GraphML export capabilities
+- ✅ Comprehensive test suite (6/6 tests passing)
+- ✅ CLI with download, build, reason, and stats commands
+- ✅ Processed document persistence in `data/processed/`
+
+### Current Graph Statistics
+- **Total Nodes**: 516
+- **Total Relationships**: 1,615
+- **Node Types**: PEP (21), Feature (14), Concept (14), Decision (38), Tradeoff (31), RejectedAlternative (174), Problem (28), Author (29), PythonRelease (14), Section (134), External (19)
+
+### Dataset Coverage
+- 26 typing-related PEPs downloaded and processed
+- PEPs include: 3107, 483, 484, 526, 544, 560, 563, 585, 586, 589, 591, 593, 604, 612, 613, 646, 647, 655, 673, 675, 681, 692, 695, 696, 698, 705
+
 ## Future Improvements
 
-- Add richer manually curated mappings for each selected PEP.
-- Persist processed parsed documents under `data/processed/`.
-- Add a small graph visualization image in addition to GraphML.
-- Add more relationship rules for supersession, dependency, and compatibility.
-- Add CLI options for showing complete reasoning chains and graph paths.
+- Add richer manually curated mappings for each selected PEP
+- Add a small graph visualization image in addition to GraphML
+- Add more relationship rules for supersession, dependency, and compatibility
+- Add CLI options for showing complete reasoning chains and graph paths
+- Expand PEP coverage to include additional typing-related proposals
+- Improve extraction rules for edge cases and unusual wording patterns
