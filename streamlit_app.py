@@ -46,7 +46,7 @@ def load_parsed_peps():
 def get_build_timestamp():
     """Get the timestamp when the graph was built."""
     if KNOWLEDGE_STATE_PATH.exists():
-        return datetime.fromtimestamp(KNOWLEDLEDGE_STATE_PATH.stat().st_mtime)
+        return datetime.fromtimestamp(KNOWLEDGE_STATE_PATH.stat().st_mtime)
     return None
 
 # Sidebar
